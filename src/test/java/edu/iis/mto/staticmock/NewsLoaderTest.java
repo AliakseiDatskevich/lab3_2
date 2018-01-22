@@ -1,12 +1,17 @@
 package edu.iis.mto.staticmock;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.powermock.api.mockito.PowerMockito.*;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
 import edu.iis.mto.staticmock.reader.NewsReader;
 
@@ -17,14 +22,13 @@ public class NewsLoaderTest {
 
     @Before
     public void setUp() {
-        mockStatic(ConfigurationLoader.class);
         Configuration configuration = new Configuration();
+        mockStatic(ConfigurationLoader.class);
         ConfigurationLoader configurationLoader = mock(ConfigurationLoader.class);
+        String readerType = "test";
+        Whitebox.setInternalState(configuration, "readerType", readerType);
         when(ConfigurationLoader.getInstance()).thenReturn(configurationLoader);
         when(ConfigurationLoader.getInstance().loadConfiguration()).thenReturn(configuration);
-        mockStatic(NewsReaderFactory.class);
-        NewsReaderFactory newsReaderFactory = mock(NewsReaderFactory.class);
-        NewsReader newsReader = mock(NewsReader.class);
         IncomingNews incomingNews = new IncomingNews();
         IncomingInfo infoA = new IncomingInfo("infoA", SubsciptionType.A);
         IncomingInfo infoB = new IncomingInfo("infoB", SubsciptionType.B);
@@ -34,11 +38,17 @@ public class NewsLoaderTest {
         incomingNews.add(infoB);
         incomingNews.add(infoC);
         incomingNews.add(infoNone);
-        String readerType = "test";
+        NewsReader newsReader = mock(NewsReader.class);
         when(newsReader.read()).thenReturn(incomingNews);
+        mockStatic(NewsReaderFactory.class);
         when(NewsReaderFactory.getReader(readerType)).thenReturn(newsReader);
     }
 
     @Test
-    public void testLoadNews() {}
+    public void testReturnOnePublicInfo() {
+        NewsLoader newsLoader = new NewsLoader();
+        PublishableNews publishableNews = newsLoader.loadNews();
+        List<String> publicContent = Whitebox.getInternalState(publishableNews, "publicContent");
+        assertThat(publicContent.size(), is(1));
+    }
 }
