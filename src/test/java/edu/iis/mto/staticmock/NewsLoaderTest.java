@@ -26,6 +26,14 @@ public class NewsLoaderTest {
         NewsReaderFactory newsReaderFactory = mock(NewsReaderFactory.class);
         NewsReader newsReader = mock(NewsReader.class);
         IncomingNews incomingNews = new IncomingNews();
+        IncomingInfo infoA = new IncomingInfo("infoA", SubsciptionType.A);
+        IncomingInfo infoB = new IncomingInfo("infoB", SubsciptionType.B);
+        IncomingInfo infoC = new IncomingInfo("infoC", SubsciptionType.C);
+        IncomingInfo infoNone = new IncomingInfo("infoNone", SubsciptionType.NONE);
+        incomingNews.add(infoA);
+        incomingNews.add(infoB);
+        incomingNews.add(infoC);
+        incomingNews.add(infoNone);
         String readerType = "test";
         when(newsReader.read()).thenReturn(incomingNews);
         when(NewsReaderFactory.getReader(readerType)).thenReturn(newsReader);
