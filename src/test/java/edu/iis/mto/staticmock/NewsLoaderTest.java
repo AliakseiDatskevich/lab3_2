@@ -65,6 +65,13 @@ public class NewsLoaderTest {
     public void testPublicContentReturnOneElement() {
         PublishableNews publishableNews = newsLoader.loadNews();
         List<String> publicContent = Whitebox.getInternalState(publishableNews, "publicContent");
-        assertThat(publicContent.toArray(new String[1]), is(new String[]{"infoNone"}));
+        assertThat(publicContent.toArray(new String[1]), is(new String[] {"infoNone"}));
+    }
+
+    @Test
+    public void testSubscribentContentReturnThreeElement() {
+        PublishableNews publishableNews = newsLoader.loadNews();
+        List<String> subscribentContent = Whitebox.getInternalState(publishableNews, "subscribentContent");
+        assertThat(subscribentContent.toArray(new String[3]), is(new String[] {"infoA", "infoB", "infoC"}));
     }
 }
