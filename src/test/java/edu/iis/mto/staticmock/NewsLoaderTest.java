@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
@@ -21,6 +22,7 @@ import edu.iis.mto.staticmock.reader.NewsReader;
 public class NewsLoaderTest {
 
     private NewsLoader newsLoader;
+    private NewsReader newsReader;
 
     @Before
     public void setUp() {
@@ -41,7 +43,7 @@ public class NewsLoaderTest {
         incomingNews.add(infoB);
         incomingNews.add(infoC);
         incomingNews.add(infoNone);
-        NewsReader newsReader = mock(NewsReader.class);
+        newsReader = mock(NewsReader.class);
         when(newsReader.read()).thenReturn(incomingNews);
         mockStatic(NewsReaderFactory.class);
         when(NewsReaderFactory.getReader(readerType)).thenReturn(newsReader);
@@ -73,5 +75,11 @@ public class NewsLoaderTest {
         PublishableNews publishableNews = newsLoader.loadNews();
         List<String> subscribentContent = Whitebox.getInternalState(publishableNews, "subscribentContent");
         assertThat(subscribentContent.toArray(new String[3]), is(new String[] {"infoA", "infoB", "infoC"}));
+    }
+
+    @Test
+    public void testReadNewsReaderCallOnce() {
+        newsLoader.loadNews();
+        Mockito.verify(newsReader, Mockito.times(1)).read();
     }
 }
