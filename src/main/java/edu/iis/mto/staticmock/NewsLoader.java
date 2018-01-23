@@ -2,6 +2,9 @@ package edu.iis.mto.staticmock;
 
 import edu.iis.mto.staticmock.reader.NewsReader;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NewsLoader {
 	public PublishableNews loadNews(){
 		Configuration config = ConfigurationLoader.getInstance().loadConfiguration();
@@ -23,5 +26,16 @@ public class NewsLoader {
 		}
 		
 		return publishable;
+	}
+
+	private PublishableNews getPublishableNewsMockWithOverrideAddForSubMethod() {
+		return new PublishableNews() {
+			private final List<String> subscribentContent = new ArrayList<>();
+
+			@Override
+			public void addForSubscription(String content, SubsciptionType subscriptionType) {
+				this.subscribentContent.add(content);
+			}
+		};
 	}
 }
