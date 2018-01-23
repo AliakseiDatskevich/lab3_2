@@ -48,16 +48,23 @@ public class NewsLoaderTest {
     }
 
     @Test
-    public void testReturnOnePublicInfo() {
+    public void testSizePublicContentReturnOne() {
         PublishableNews publishableNews = newsLoader.loadNews();
         List<String> publicContent = Whitebox.getInternalState(publishableNews, "publicContent");
         assertThat(publicContent.size(), is(1));
     }
 
     @Test
-    public void testReturnThreeSubscription() {
+    public void testSizeSubscribentContentReturnThree() {
         PublishableNews publishableNews = newsLoader.loadNews();
         List<String> subscribentContent = Whitebox.getInternalState(publishableNews, "subscribentContent");
         assertThat(subscribentContent.size(), is(3));
+    }
+
+    @Test
+    public void testPublicContentReturnOneElement() {
+        PublishableNews publishableNews = newsLoader.loadNews();
+        List<String> publicContent = Whitebox.getInternalState(publishableNews, "publicContent");
+        assertThat(publicContent.toArray(new String[1]), is(new String[]{"infoNone"}));
     }
 }
