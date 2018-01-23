@@ -2,6 +2,8 @@ package edu.iis.mto.staticmock;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
 import static org.powermock.api.mockito.PowerMockito.*;
 
 import java.util.List;
@@ -80,6 +82,13 @@ public class NewsLoaderTest {
     @Test
     public void testReadNewsReaderCallOnce() {
         newsLoader.loadNews();
-        Mockito.verify(newsReader, Mockito.times(1)).read();
+        Mockito.verify(newsReader, times(1)).read();
+    }
+
+    @Test
+    public void testGetReaderNewsReaderFactoryCallOnce() {
+        newsLoader.loadNews();
+        verifyStatic(times(1));
+        NewsReaderFactory.getReader(anyString());
     }
 }
