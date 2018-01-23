@@ -20,8 +20,11 @@ import edu.iis.mto.staticmock.reader.NewsReader;
 
 public class NewsLoaderTest {
 
+    private NewsLoader newsLoader;
+
     @Before
     public void setUp() {
+        newsLoader = new NewsLoader();
         Configuration configuration = new Configuration();
         mockStatic(ConfigurationLoader.class);
         ConfigurationLoader configurationLoader = mock(ConfigurationLoader.class);
@@ -46,9 +49,15 @@ public class NewsLoaderTest {
 
     @Test
     public void testReturnOnePublicInfo() {
-        NewsLoader newsLoader = new NewsLoader();
         PublishableNews publishableNews = newsLoader.loadNews();
         List<String> publicContent = Whitebox.getInternalState(publishableNews, "publicContent");
         assertThat(publicContent.size(), is(1));
+    }
+
+    @Test
+    public void testReturnThreeSubscription() {
+        PublishableNews publishableNews = newsLoader.loadNews();
+        List<String> subscribentContent = Whitebox.getInternalState(publishableNews, "subscribentContent");
+        assertThat(subscribentContent.size(), is(3));
     }
 }
