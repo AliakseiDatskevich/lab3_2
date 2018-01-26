@@ -33,35 +33,25 @@ public class Zad3_2NewsLoaderTest {
 
     private IncomingNews incomingNews;
     private IncomingInfo infoForAll;
-    private IncomingInfo infoForSubscribers;
+    private IncomingInfo infoForSubscribersB;
     private IncomingInfo infoForSubscribersC;
     private NewsLoader newsLoader;
     private NewsReader newsReader;
-    private NewsReaderFactory newsReaderFactory;
     private String readerType;
 
     @Before
     public void setUp() {
         Configuration configuration = new Configuration();
         mockStatic(ConfigurationLoader.class);
-
         ConfigurationLoader configurationLoader = mock(ConfigurationLoader.class);
-        ConfigurationLoader configurationMockLoader = mock(ConfigurationLoader.class);
         when(ConfigurationLoader.getInstance()).thenReturn(configurationLoader);
-        when(configurationMockLoader.loadConfiguration()).thenReturn(configuration);
-        readerType = "typReadera";
         infoForAll = new IncomingInfo("publicContent", SubsciptionType.NONE);
-        infoForSubscribers = new IncomingInfo("subscribentContent", SubsciptionType.B);
+        infoForSubscribersB = new IncomingInfo("subscribentContent", SubsciptionType.B);
         infoForSubscribersC = new IncomingInfo("subscribentContent", SubsciptionType.C);
         newsReader = mock(NewsReader.class);
         incomingNews = new IncomingNews();
-
-        newsReaderFactory = mock(NewsReaderFactory.class);
-
         newsLoader = new NewsLoader();
         Whitebox.setInternalState(configuration, "readerType", readerType);
-        when(ConfigurationLoader.getInstance()).thenReturn(configurationMockLoader);
-
         when(ConfigurationLoader.getInstance().loadConfiguration()).thenReturn(configuration);
         mockStatic(NewsReaderFactory.class);
         when(newsReader.read()).thenReturn(incomingNews);
@@ -75,8 +65,7 @@ public class Zad3_2NewsLoaderTest {
         ArrayList<String> newsList = Whitebox.getInternalState(publishableNews, "publicContent");
         assertEquals(1, newsList.size());
         assertTrue(newsList.contains(infoForAll.getContent()));
-        assertFalse(newsList.contains(infoForSubscribers.getContent()));
-
+        assertFalse(newsList.contains(infoForSubscribersB.getContent()));
     }
 
     @Test
@@ -91,12 +80,12 @@ public class Zad3_2NewsLoaderTest {
 
     @Test
     public void oneInfoWithSubscripionNeededProperlyLoadedTest() {
-        incomingNews.add(infoForSubscribers);
+        incomingNews.add(infoForSubscribersB);
         PublishableNews publishableNews = newsLoader.loadNews();
         ArrayList<String> newsList = Whitebox.getInternalState(publishableNews, "subscribentContent");
         assertEquals(1, newsList.size());
         assertFalse(newsList.contains(infoForAll.getContent()));
-        assertTrue(newsList.contains(infoForSubscribers.getContent()));
+        assertTrue(newsList.contains(infoForSubscribersB.getContent()));
     }
 
     @Test
@@ -113,7 +102,7 @@ public class Zad3_2NewsLoaderTest {
     public void twoInfoWithDifferentSubscripionTypeNeededTwoLoadsTest() {
 
         incomingNews.add(infoForSubscribersC);
-        incomingNews.add(infoForSubscribers);
+        incomingNews.add(infoForSubscribersB);
         PublishableNews publishableNews = newsLoader.loadNews();
         ArrayList<String> newsList = Whitebox.getInternalState(publishableNews, "subscribentContent");
         assertEquals(2, newsList.size());
