@@ -19,7 +19,10 @@ public class PublishableNews {
 
     public void addForSubscription(String content, SubsciptionType subscriptionType) {
         // TODO Auto-generated method stub
-
+        // Komentarz AS do zadania 3_1 -nie jestem pewien, czy to jest do konca zgodne z trescia zadania, ale zeby
+        // zapewnic
+        // funkcjonalnosc ta implementacja i tak jest konieczna, wiec uznalem to za najlepsza opcje
+        this.subscribentContent.add(content);
     }
 
 }

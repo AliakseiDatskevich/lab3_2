@@ -87,4 +87,14 @@ public class Zad3_2NewsLoaderTest {
         assertEquals(5, newsList.size());
     }
 
+    @Test
+    public void oneInfoWithSubscripionNeededProperlyLoadedTest() {
+        incomingNews.add(infoForSubscribers);
+        PublishableNews publishableNews = newsLoader.loadNews();
+        ArrayList<String> newsList = Whitebox.getInternalState(publishableNews, "subscribentContent");
+        assertEquals(1, newsList.size());
+        assertFalse(newsList.contains(infoForAll.getContent()));
+        assertTrue(newsList.contains(infoForSubscribers.getContent()));
+
+    }
 }
