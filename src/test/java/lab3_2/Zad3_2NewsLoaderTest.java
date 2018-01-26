@@ -7,7 +7,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,12 +50,11 @@ public class Zad3_2NewsLoaderTest {
         when(configurationMockLoader.loadConfiguration()).thenReturn(configuration);
         readerType = "typReadera";
         infoForAll = new IncomingInfo("publicContent", SubsciptionType.NONE);
+        infoForSubscribers = new IncomingInfo("subscribentContent", SubsciptionType.B);
         newsReader = mock(NewsReader.class);
         incomingNews = new IncomingNews();
 
         newsReaderFactory = mock(NewsReaderFactory.class);
-
-        infoForSubscribers = new IncomingInfo("ContentForSubscriptionB", SubsciptionType.B);
 
         newsLoader = new NewsLoader();
         Whitebox.setInternalState(configuration, "readerType", readerType);
@@ -71,10 +70,21 @@ public class Zad3_2NewsLoaderTest {
     public void oneInfoWithNoSubscripionNeededProperlyLoadedTest() {
         incomingNews.add(infoForAll);
         PublishableNews publishableNews = newsLoader.loadNews();
-        List<String> newsList = Whitebox.getInternalState(publishableNews, "publicContent");
-        assertEquals(newsList.size(), 1);
+        ArrayList<String> newsList = Whitebox.getInternalState(publishableNews, "publicContent");
+        assertEquals(1, newsList.size());
         assertTrue(newsList.contains(infoForAll.getContent()));
         assertFalse(newsList.contains(infoForSubscribers.getContent()));
 
     }
+
+    @Test
+    public void fiveInfoWithNoSubscripionNeededFiveLoadsTest() {
+        for (int i = 0; i < 5; i++) {
+            incomingNews.add(infoForAll);
+        }
+        PublishableNews publishableNews = newsLoader.loadNews();
+        ArrayList<String> newsList = Whitebox.getInternalState(publishableNews, "publicContent");
+        assertEquals(5, newsList.size());
+    }
+
 }
