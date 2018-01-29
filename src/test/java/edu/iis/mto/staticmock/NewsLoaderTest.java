@@ -70,4 +70,12 @@ public class NewsLoaderTest {
 		assertThat(newsList.get(0), Matchers.is(content));
 	}
 
+	@Test
+	public void sizeOfPublicNewsArrayIsReturnedCorrectly() {
+		PublishableNews publishableNews = PublishableNews.create();
+		String content = "Public news";
+		publishableNews.addPublicInfo(content);
+		List<String> newsList = Whitebox.getInternalState(publishableNews, "publicContent");
+		assertThat(newsList.size(), Matchers.is(1));
+	}
 }
