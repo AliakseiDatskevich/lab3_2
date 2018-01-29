@@ -1,11 +1,15 @@
 package edu.iis.mto.staticmock;
 
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
+import java.util.List;
+
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +51,14 @@ public class NewsLoaderTest {
 	public void readMethodShouldBeCalledOnceWhenNewsIsLoaded() {
 		newsLoader.loadNews();
 		verify(mockedNewsReader, times(1)).read();
+	}
+
+	@Test
+	public void newsForSubscriptionTypeAIsAddedCorrectly() {
+		PublishableNews publishableNews = PublishableNews.create();
+		publishableNews.addForSubscription("Subscription Type A", SubsciptionType.A);
+		List<String> newsList = Whitebox.getInternalState(publishableNews, "subscribentContent");
+		assertThat(newsList.size(), Matchers.is(1));
 	}
 
 }
