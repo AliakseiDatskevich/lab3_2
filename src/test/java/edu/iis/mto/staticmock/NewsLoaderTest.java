@@ -61,4 +61,13 @@ public class NewsLoaderTest {
 		assertThat(newsList.size(), Matchers.is(1));
 	}
 
+	@Test
+	public void newsContentForSubscriptionTypeBIsAddedCorrectly() {
+		PublishableNews publishableNews = PublishableNews.create();
+		String content = "Subscription Type B";
+		publishableNews.addForSubscription(content, SubsciptionType.B);
+		List<String> newsList = Whitebox.getInternalState(publishableNews, "subscribentContent");
+		assertThat(newsList.get(0), Matchers.is(content));
+	}
+
 }
