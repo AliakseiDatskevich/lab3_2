@@ -13,7 +13,11 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.*;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
 /**
  * Created by Justyna on 30.01.2018.
@@ -25,16 +29,18 @@ import static org.powermock.api.mockito.PowerMockito.*;
 public class NewsLoaderTest {
 
     private NewsReader newsReader;
+    private ConfigurationLoader configurationLoader;
 
     @Before
     public void setUp() {
         mockStatic(ConfigurationLoader.class);
         mockStatic(NewsReaderFactory.class);
 
-        ConfigurationLoader configurationLoader = mock(ConfigurationLoader.class);
+        configurationLoader = mock(ConfigurationLoader.class);
         when(ConfigurationLoader.getInstance()).thenReturn(configurationLoader);
 
         Configuration configuration = mock(Configuration.class);
+        when(configuration.getReaderType()).thenReturn("WS");
         when(configurationLoader.loadConfiguration()).thenReturn(configuration);
 
         newsReader = mock(NewsReader.class);
@@ -91,6 +97,19 @@ public class NewsLoaderTest {
         assertEquals(publicContent.get(0), "publicContent");
         assertEquals(subscribentContent.get(0), "content");
         assertEquals(subscribentContent.get(1), "content1");
+    }
+
+    @Test
+    public void areMethodsCalledProperly() {
+
+        when(newsReader.read()).thenReturn(prepareIncomingNews2());
+        NewsLoader newsLoader = new NewsLoader();
+        newsLoader.loadNews();
+
+        verify(configurationLoader, times(1)).loadConfiguration();
+
+        verifyStatic(NewsReaderFactory.class);
+        NewsReaderFactory.getReader("WS");
     }
 
     private IncomingNews prepareIncomingNews() {
