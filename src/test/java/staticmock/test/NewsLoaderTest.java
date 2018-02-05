@@ -33,6 +33,8 @@ import edu.iis.mto.staticmock.reader.NewsReader;
 @PrepareForTest({NewsReaderFactory.class, PublishableNews.class, ConfigurationLoader.class})
 public class NewsLoaderTest {
 
+    String readerType = "File";
+    String content = "Test";
     private PublishableNews publishableNews = null;
     private PublishableNews publishableNewsMock = mock(PublishableNews.class);
     private NewsLoader newsLoader = new NewsLoader();
@@ -41,7 +43,7 @@ public class NewsLoaderTest {
     private NewsReader newsReaderMock = mock(NewsReader.class);
     private IncomingNews incomingNewsMock = mock(IncomingNews.class);
     private IncomingInfo incomingInfoMock = mock(IncomingInfo.class);
-    private List<IncomingInfo> listOfIncomingInfoMocks = new ArrayList();
+    private ArrayList<IncomingInfo> listOfIncomingInfoMocks = new ArrayList();
 
     @Before
     public void setUp() {
@@ -49,6 +51,13 @@ public class NewsLoaderTest {
         PowerMockito.mockStatic(NewsReaderFactory.class);
         PowerMockito.mockStatic(PublishableNews.class);
         PowerMockito.mockStatic(ConfigurationLoader.class);
+        when(ConfigurationLoader.getInstance()).thenReturn(configurationLoaderMock);
+        when(configurationLoaderMock.loadConfiguration()).thenReturn(configurationMock);
+        when(configurationMock.getReaderType()).thenReturn(readerType);
+        when(NewsReaderFactory.getReader(readerType)).thenReturn(newsReaderMock);
+        when(newsReaderMock.read()).thenReturn(incomingNewsMock);
+        when(incomingNewsMock.elems()).thenReturn(listOfIncomingInfoMocks);
+
     }
 
     @After
@@ -59,18 +68,10 @@ public class NewsLoaderTest {
     @Test
     public void loadNewsShouldReturnOnePublishableNewsWithOnePublicElement() {
         int expectedOutput = 1;
-        String readerType = "File";
-        String content = "Test";
 
         listOfIncomingInfoMocks.add(incomingInfoMock);
 
-        when(ConfigurationLoader.getInstance()).thenReturn(configurationLoaderMock);
-        when(configurationLoaderMock.loadConfiguration()).thenReturn(configurationMock);
-        when(configurationMock.getReaderType()).thenReturn(readerType);
-        when(NewsReaderFactory.getReader(readerType)).thenReturn(newsReaderMock);
-        when(newsReaderMock.read()).thenReturn(incomingNewsMock);
         when(PublishableNews.create()).thenReturn(publishableNews);
-        when(incomingNewsMock.elems()).thenReturn(listOfIncomingInfoMocks);
         when(incomingInfoMock.requiresSubsciption()).thenReturn(false);
         when(incomingInfoMock.getContent()).thenReturn(content);
 
@@ -83,15 +84,8 @@ public class NewsLoaderTest {
     @Test
     public void loadNewsShouldReturnOnePublishableNewsWithNoPublicElements() {
         int expectedOutput = 0;
-        String readerType = "File";
 
-        when(ConfigurationLoader.getInstance()).thenReturn(configurationLoaderMock);
-        when(configurationLoaderMock.loadConfiguration()).thenReturn(configurationMock);
-        when(configurationMock.getReaderType()).thenReturn(readerType);
-        when(NewsReaderFactory.getReader(readerType)).thenReturn(newsReaderMock);
-        when(newsReaderMock.read()).thenReturn(incomingNewsMock);
         when(PublishableNews.create()).thenReturn(publishableNews);
-        when(incomingNewsMock.elems()).thenReturn(listOfIncomingInfoMocks);
 
         PublishableNews actualNews = newsLoader.loadNews();
         List<String> actualOutput = Whitebox.getInternalState(actualNews, "publicContent");
@@ -102,19 +96,11 @@ public class NewsLoaderTest {
     @Test
     public void loadNewsShouldReturnOnePublishableNewsWithTwoPublicElements() {
         int expectedOutput = 2;
-        String readerType = "File";
-        String content = "Test";
 
         listOfIncomingInfoMocks.add(incomingInfoMock);
         listOfIncomingInfoMocks.add(incomingInfoMock);
 
-        when(ConfigurationLoader.getInstance()).thenReturn(configurationLoaderMock);
-        when(configurationLoaderMock.loadConfiguration()).thenReturn(configurationMock);
-        when(configurationMock.getReaderType()).thenReturn(readerType);
-        when(NewsReaderFactory.getReader(readerType)).thenReturn(newsReaderMock);
-        when(newsReaderMock.read()).thenReturn(incomingNewsMock);
         when(PublishableNews.create()).thenReturn(publishableNews);
-        when(incomingNewsMock.elems()).thenReturn(listOfIncomingInfoMocks);
         when(incomingInfoMock.requiresSubsciption()).thenReturn(false);
         when(incomingInfoMock.getContent()).thenReturn(content);
 
@@ -127,18 +113,10 @@ public class NewsLoaderTest {
     @Test
     public void addSubscriptionMethodShouldBeCalledOnce() {
         int expectedTimes = 1;
-        String readerType = "File";
-        String content = "Test";
 
         listOfIncomingInfoMocks.add(incomingInfoMock);
 
-        when(ConfigurationLoader.getInstance()).thenReturn(configurationLoaderMock);
-        when(configurationLoaderMock.loadConfiguration()).thenReturn(configurationMock);
-        when(configurationMock.getReaderType()).thenReturn(readerType);
-        when(NewsReaderFactory.getReader(readerType)).thenReturn(newsReaderMock);
-        when(newsReaderMock.read()).thenReturn(incomingNewsMock);
         when(PublishableNews.create()).thenReturn(publishableNewsMock);
-        when(incomingNewsMock.elems()).thenReturn(listOfIncomingInfoMocks);
         when(incomingInfoMock.requiresSubsciption()).thenReturn(true);
         when(incomingInfoMock.getContent()).thenReturn(content);
         when(incomingInfoMock.getSubscriptionType()).thenReturn(SubsciptionType.A);
@@ -151,19 +129,11 @@ public class NewsLoaderTest {
     @Test
     public void addSubscriptionMethodShouldBeCalledTwice() {
         int expectedTimes = 2;
-        String readerType = "File";
-        String content = "Test";
 
         listOfIncomingInfoMocks.add(incomingInfoMock);
         listOfIncomingInfoMocks.add(incomingInfoMock);
 
-        when(ConfigurationLoader.getInstance()).thenReturn(configurationLoaderMock);
-        when(configurationLoaderMock.loadConfiguration()).thenReturn(configurationMock);
-        when(configurationMock.getReaderType()).thenReturn(readerType);
-        when(NewsReaderFactory.getReader(readerType)).thenReturn(newsReaderMock);
-        when(newsReaderMock.read()).thenReturn(incomingNewsMock);
         when(PublishableNews.create()).thenReturn(publishableNewsMock);
-        when(incomingNewsMock.elems()).thenReturn(listOfIncomingInfoMocks);
         when(incomingInfoMock.requiresSubsciption()).thenReturn(true);
         when(incomingInfoMock.getContent()).thenReturn(content);
         when(incomingInfoMock.getSubscriptionType()).thenReturn(SubsciptionType.A);
@@ -176,16 +146,8 @@ public class NewsLoaderTest {
     @Test
     public void addSubscriptionMethodShouldNotBeCalled() {
         int expectedTimes = 0;
-        String readerType = "File";
-        String content = "Test";
 
-        when(ConfigurationLoader.getInstance()).thenReturn(configurationLoaderMock);
-        when(configurationLoaderMock.loadConfiguration()).thenReturn(configurationMock);
-        when(configurationMock.getReaderType()).thenReturn(readerType);
-        when(NewsReaderFactory.getReader(readerType)).thenReturn(newsReaderMock);
-        when(newsReaderMock.read()).thenReturn(incomingNewsMock);
         when(PublishableNews.create()).thenReturn(publishableNewsMock);
-        when(incomingNewsMock.elems()).thenReturn(listOfIncomingInfoMocks);
 
         newsLoader.loadNews();
 
