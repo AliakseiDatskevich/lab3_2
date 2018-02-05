@@ -173,4 +173,23 @@ public class NewsLoaderTest {
         verify(publishableNewsMock, times(expectedTimes)).addForSubscription(content, SubsciptionType.A);
     }
 
+    @Test
+    public void addSubscriptionMethodShouldNotBeCalled() {
+        int expectedTimes = 0;
+        String readerType = "File";
+        String content = "Test";
+
+        when(ConfigurationLoader.getInstance()).thenReturn(configurationLoaderMock);
+        when(configurationLoaderMock.loadConfiguration()).thenReturn(configurationMock);
+        when(configurationMock.getReaderType()).thenReturn(readerType);
+        when(NewsReaderFactory.getReader(readerType)).thenReturn(newsReaderMock);
+        when(newsReaderMock.read()).thenReturn(incomingNewsMock);
+        when(PublishableNews.create()).thenReturn(publishableNewsMock);
+        when(incomingNewsMock.elems()).thenReturn(listOfIncomingInfoMocks);
+
+        newsLoader.loadNews();
+
+        verify(publishableNewsMock, times(expectedTimes)).addForSubscription(content, SubsciptionType.A);
+    }
+
 }
