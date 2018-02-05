@@ -148,4 +148,29 @@ public class NewsLoaderTest {
         verify(publishableNewsMock, times(expectedTimes)).addForSubscription(content, SubsciptionType.A);
     }
 
+    @Test
+    public void addSubscriptionMethodShouldBeCalledTwice() {
+        int expectedTimes = 2;
+        String readerType = "File";
+        String content = "Test";
+
+        listOfIncomingInfoMocks.add(incomingInfoMock);
+        listOfIncomingInfoMocks.add(incomingInfoMock);
+
+        when(ConfigurationLoader.getInstance()).thenReturn(configurationLoaderMock);
+        when(configurationLoaderMock.loadConfiguration()).thenReturn(configurationMock);
+        when(configurationMock.getReaderType()).thenReturn(readerType);
+        when(NewsReaderFactory.getReader(readerType)).thenReturn(newsReaderMock);
+        when(newsReaderMock.read()).thenReturn(incomingNewsMock);
+        when(PublishableNews.create()).thenReturn(publishableNewsMock);
+        when(incomingNewsMock.elems()).thenReturn(listOfIncomingInfoMocks);
+        when(incomingInfoMock.requiresSubsciption()).thenReturn(true);
+        when(incomingInfoMock.getContent()).thenReturn(content);
+        when(incomingInfoMock.getSubscriptionType()).thenReturn(SubsciptionType.A);
+
+        newsLoader.loadNews();
+
+        verify(publishableNewsMock, times(expectedTimes)).addForSubscription(content, SubsciptionType.A);
+    }
+
 }
