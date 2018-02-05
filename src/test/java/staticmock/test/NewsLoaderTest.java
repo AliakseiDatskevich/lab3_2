@@ -77,7 +77,7 @@ public class NewsLoaderTest {
     }
 
     @Test
-    public void loadNewsShouldReturnOnePublishableNewsWithNoPublicElement() {
+    public void loadNewsShouldReturnOnePublishableNewsWithNoPublicElements() {
         int expectedOutput = 0;
         String readerType = "File";
 
@@ -88,6 +88,31 @@ public class NewsLoaderTest {
         when(newsReaderMock.read()).thenReturn(incomingNewsMock);
         when(PublishableNews.create()).thenReturn(publishableNews);
         when(incomingNewsMock.elems()).thenReturn(listOfIncomingInfoMocks);
+
+        PublishableNews actualNews = newsLoader.loadNews();
+        List<String> actualOutput = Whitebox.getInternalState(actualNews, "publicContent");
+
+        assertThat(actualOutput.size(), is(expectedOutput));
+    }
+
+    @Test
+    public void loadNewsShouldReturnOnePublishableNewsWithTwoPublicElements() {
+        int expectedOutput = 2;
+        String readerType = "File";
+        String content = "Test";
+
+        listOfIncomingInfoMocks.add(incomingInfoMock);
+        listOfIncomingInfoMocks.add(incomingInfoMock);
+
+        when(ConfigurationLoader.getInstance()).thenReturn(configurationLoaderMock);
+        when(configurationLoaderMock.loadConfiguration()).thenReturn(configurationMock);
+        when(configurationMock.getReaderType()).thenReturn(readerType);
+        when(NewsReaderFactory.getReader(readerType)).thenReturn(newsReaderMock);
+        when(newsReaderMock.read()).thenReturn(incomingNewsMock);
+        when(PublishableNews.create()).thenReturn(publishableNews);
+        when(incomingNewsMock.elems()).thenReturn(listOfIncomingInfoMocks);
+        when(incomingInfoMock.requiresSubsciption()).thenReturn(false);
+        when(incomingInfoMock.getContent()).thenReturn(content);
 
         PublishableNews actualNews = newsLoader.loadNews();
         List<String> actualOutput = Whitebox.getInternalState(actualNews, "publicContent");
