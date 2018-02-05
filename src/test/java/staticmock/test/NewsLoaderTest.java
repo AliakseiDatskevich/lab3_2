@@ -30,7 +30,7 @@ import edu.iis.mto.staticmock.reader.NewsReader;
 @PrepareForTest({NewsReaderFactory.class, PublishableNews.class, ConfigurationLoader.class})
 public class NewsLoaderTest {
 
-    private PublishableNews publishableNews;
+    private PublishableNews publishableNews = null;
     private NewsLoader newsLoader = new NewsLoader();
     private ConfigurationLoader configurationLoaderMock = mock(ConfigurationLoader.class);
     private Configuration configurationMock = mock(Configuration.class);
@@ -41,10 +41,10 @@ public class NewsLoaderTest {
 
     @Before
     public void setUp() {
+        publishableNews = PublishableNews.create();
         PowerMockito.mockStatic(NewsReaderFactory.class);
         PowerMockito.mockStatic(PublishableNews.class);
         PowerMockito.mockStatic(ConfigurationLoader.class);
-        publishableNews = PublishableNews.create();
     }
 
     @After
@@ -74,7 +74,25 @@ public class NewsLoaderTest {
         List<String> actualOutput = Whitebox.getInternalState(actualNews, "publicContent");
 
         assertThat(actualOutput.size(), is(expectedOutput));
+    }
 
+    @Test
+    public void loadNewsShouldReturnOnePublishableNewsWithNoPublicElement() {
+        int expectedOutput = 0;
+        String readerType = "File";
+
+        when(ConfigurationLoader.getInstance()).thenReturn(configurationLoaderMock);
+        when(configurationLoaderMock.loadConfiguration()).thenReturn(configurationMock);
+        when(configurationMock.getReaderType()).thenReturn(readerType);
+        when(NewsReaderFactory.getReader(readerType)).thenReturn(newsReaderMock);
+        when(newsReaderMock.read()).thenReturn(incomingNewsMock);
+        when(PublishableNews.create()).thenReturn(publishableNews);
+        when(incomingNewsMock.elems()).thenReturn(listOfIncomingInfoMocks);
+
+        PublishableNews actualNews = newsLoader.loadNews();
+        List<String> actualOutput = Whitebox.getInternalState(actualNews, "publicContent");
+
+        assertThat(actualOutput.size(), is(expectedOutput));
     }
 
 }
