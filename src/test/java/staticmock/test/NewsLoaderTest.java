@@ -2,6 +2,8 @@ package staticmock.test;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -24,6 +26,7 @@ import edu.iis.mto.staticmock.IncomingNews;
 import edu.iis.mto.staticmock.NewsLoader;
 import edu.iis.mto.staticmock.NewsReaderFactory;
 import edu.iis.mto.staticmock.PublishableNews;
+import edu.iis.mto.staticmock.SubsciptionType;
 import edu.iis.mto.staticmock.reader.NewsReader;
 
 @RunWith(PowerMockRunner.class)
@@ -31,6 +34,7 @@ import edu.iis.mto.staticmock.reader.NewsReader;
 public class NewsLoaderTest {
 
     private PublishableNews publishableNews = null;
+    private PublishableNews publishableNewsMock = mock(PublishableNews.class);
     private NewsLoader newsLoader = new NewsLoader();
     private ConfigurationLoader configurationLoaderMock = mock(ConfigurationLoader.class);
     private Configuration configurationMock = mock(Configuration.class);
@@ -118,6 +122,30 @@ public class NewsLoaderTest {
         List<String> actualOutput = Whitebox.getInternalState(actualNews, "publicContent");
 
         assertThat(actualOutput.size(), is(expectedOutput));
+    }
+
+    @Test
+    public void addSubscriptionMethodShouldBeCalledOnce() {
+        int expectedTimes = 1;
+        String readerType = "File";
+        String content = "Test";
+
+        listOfIncomingInfoMocks.add(incomingInfoMock);
+
+        when(ConfigurationLoader.getInstance()).thenReturn(configurationLoaderMock);
+        when(configurationLoaderMock.loadConfiguration()).thenReturn(configurationMock);
+        when(configurationMock.getReaderType()).thenReturn(readerType);
+        when(NewsReaderFactory.getReader(readerType)).thenReturn(newsReaderMock);
+        when(newsReaderMock.read()).thenReturn(incomingNewsMock);
+        when(PublishableNews.create()).thenReturn(publishableNewsMock);
+        when(incomingNewsMock.elems()).thenReturn(listOfIncomingInfoMocks);
+        when(incomingInfoMock.requiresSubsciption()).thenReturn(true);
+        when(incomingInfoMock.getContent()).thenReturn(content);
+        when(incomingInfoMock.getSubscriptionType()).thenReturn(SubsciptionType.A);
+
+        newsLoader.loadNews();
+
+        verify(publishableNewsMock, times(expectedTimes)).addForSubscription(content, SubsciptionType.A);
     }
 
 }
