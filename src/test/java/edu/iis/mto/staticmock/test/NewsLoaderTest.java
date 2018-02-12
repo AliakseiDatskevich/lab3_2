@@ -1,6 +1,8 @@
 package edu.iis.mto.staticmock.test;
 
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
@@ -45,7 +47,7 @@ public class NewsLoaderTest {
     public void setUp() {
         newsLoader = new NewsLoader();
         configuration = new Configuration();
-        publishableNews = PublishableNews.create();
+        publishableNews = spy(PublishableNews.create());
 
         mockStatic(ConfigurationLoader.class);
         mockStatic(NewsReaderFactory.class);
@@ -64,6 +66,7 @@ public class NewsLoaderTest {
         when(ConfigurationLoader.getInstance().loadConfiguration()).thenReturn(configuration);
         when(NewsReaderFactory.getReader(readerTypeValue)).thenReturn(mockedNewsReader);
         when(mockedNewsReader.read()).thenReturn(mockedIncomingNews);
+        when(PublishableNews.create()).thenReturn(publishableNews);
     }
 
     @Test
@@ -77,7 +80,6 @@ public class NewsLoaderTest {
         List<IncomingInfo> incomingInfoList = new ArrayList<>();
         incomingInfoList.add(mockedIncomingInfo);
 
-        when(PublishableNews.create()).thenReturn(publishableNews);
         when(mockedIncomingNews.elems()).thenReturn(incomingInfoList);
         when(mockedIncomingInfo.requiresSubsciption()).thenReturn(false);
         when(mockedIncomingInfo.getContent()).thenReturn("TEST CONTENT");
@@ -92,7 +94,6 @@ public class NewsLoaderTest {
         List<IncomingInfo> incomingInfoList = new ArrayList<>();
         incomingInfoList.add(mockedIncomingInfo);
 
-        when(PublishableNews.create()).thenReturn(publishableNews);
         when(mockedIncomingNews.elems()).thenReturn(incomingInfoList);
         when(mockedIncomingInfo.requiresSubsciption()).thenReturn(true);
         when(mockedIncomingInfo.getContent()).thenReturn("TEST CONTENT");
@@ -109,7 +110,6 @@ public class NewsLoaderTest {
         incomingInfoList.add(new IncomingInfo("TEST CONTENT", SubsciptionType.NONE));
         incomingInfoList.add(new IncomingInfo("TEST CONTENT", SubsciptionType.A));
 
-        when(PublishableNews.create()).thenReturn(publishableNews);
         when(mockedIncomingNews.elems()).thenReturn(incomingInfoList);
 
         PublishableNews actualNews = newsLoader.loadNews();
@@ -118,5 +118,18 @@ public class NewsLoaderTest {
 
         assertThat(publicContent.size(), Matchers.is(1));
         assertThat(subscribentContent.size(), Matchers.is(1));
+    }
+
+    @Test
+    public void howManyTimesAddPublicInfoMethodIsCalled() {
+        List<IncomingInfo> incomingInfoList = new ArrayList<>();
+        incomingInfoList.add(mockedIncomingInfo);
+        incomingInfoList.add(mockedIncomingInfo);
+        incomingInfoList.add(mockedIncomingInfo);
+
+        when(mockedIncomingNews.elems()).thenReturn(incomingInfoList);
+
+        newsLoader.loadNews();
+        verify(publishableNews, times(incomingInfoList.size())).addPublicInfo(any(String.class));
     }
 }
