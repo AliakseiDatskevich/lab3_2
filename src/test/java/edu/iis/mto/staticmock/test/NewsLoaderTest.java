@@ -25,6 +25,7 @@ import edu.iis.mto.staticmock.IncomingNews;
 import edu.iis.mto.staticmock.NewsLoader;
 import edu.iis.mto.staticmock.NewsReaderFactory;
 import edu.iis.mto.staticmock.PublishableNews;
+import edu.iis.mto.staticmock.SubsciptionType;
 import edu.iis.mto.staticmock.reader.NewsReader;
 
 @RunWith(PowerMockRunner.class)
@@ -84,5 +85,21 @@ public class NewsLoaderTest {
         PublishableNews actualNews = newsLoader.loadNews();
         List<String> publicContent = Whitebox.getInternalState(actualNews, "publicContent");
         assertThat(publicContent.size(), Matchers.is(1));
+    }
+
+    @Test
+    public void isNewsLoaderLoadNewsMethodReturningPublishableNewsWithOneSubscribedElement() {
+        List<IncomingInfo> incomingInfoList = new ArrayList<>();
+        incomingInfoList.add(mockedIncomingInfo);
+
+        when(PublishableNews.create()).thenReturn(publishableNews);
+        when(mockedIncomingNews.elems()).thenReturn(incomingInfoList);
+        when(mockedIncomingInfo.requiresSubsciption()).thenReturn(true);
+        when(mockedIncomingInfo.getContent()).thenReturn("TEST CONTENT");
+        when(mockedIncomingInfo.getSubscriptionType()).thenReturn(SubsciptionType.A);
+
+        PublishableNews actualNews = newsLoader.loadNews();
+        List<String> subscribentContent = Whitebox.getInternalState(actualNews, "subscribentContent");
+        assertThat(subscribentContent.size(), Matchers.is(1));
     }
 }
