@@ -102,4 +102,21 @@ public class NewsLoaderTest {
         List<String> subscribentContent = Whitebox.getInternalState(actualNews, "subscribentContent");
         assertThat(subscribentContent.size(), Matchers.is(1));
     }
+
+    @Test
+    public void isNewsLoaderLoadNewsMethodReturningPublishableNewsWithOnePublicAndOneSubscribedElements() {
+        List<IncomingInfo> incomingInfoList = new ArrayList<>();
+        incomingInfoList.add(new IncomingInfo("TEST CONTENT", SubsciptionType.NONE));
+        incomingInfoList.add(new IncomingInfo("TEST CONTENT", SubsciptionType.A));
+
+        when(PublishableNews.create()).thenReturn(publishableNews);
+        when(mockedIncomingNews.elems()).thenReturn(incomingInfoList);
+
+        PublishableNews actualNews = newsLoader.loadNews();
+        List<String> publicContent = Whitebox.getInternalState(actualNews, "publicContent");
+        List<String> subscribentContent = Whitebox.getInternalState(actualNews, "subscribentContent");
+
+        assertThat(publicContent.size(), Matchers.is(1));
+        assertThat(subscribentContent.size(), Matchers.is(1));
+    }
 }
