@@ -1,10 +1,13 @@
 package edu.iis.mto.staticmock.test;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -43,6 +46,12 @@ public class NewsLoaderTest {
         when(ConfigurationLoader.getInstance().loadConfiguration()).thenReturn(configuration);
         when(NewsReaderFactory.getReader(readerTypeValue)).thenReturn(mockedNewsReader);
         when(mockedNewsReader.read()).thenReturn(incomingNews);
+    }
+
+    @Test
+    public void isNewsReaderReadMethodCalledOnce() {
+        newsLoader.loadNews();
+        verify(mockedNewsReader, times(1)).read();
     }
 
 }
