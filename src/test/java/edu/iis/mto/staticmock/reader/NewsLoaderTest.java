@@ -115,4 +115,63 @@ public class NewsLoaderTest {
                 .addForSubscription(Matchers.any(String.class), Matchers.any(SubsciptionType.class));
 
     }
+
+    @Test
+    public void publishableNewsAddSubscriptionNotCalled() {
+        int expectedCallsCount = 0;
+        String readerType = "Sport";
+        String content = "content";
+        incomingInfos.add(mockedIncomingInfo);
+        PowerMockito.mockStatic(PublishableNews.class);
+        PublishableNews mockedPublishableNews = mock(PublishableNews.class);
+
+        when(ConfigurationLoader.getInstance()).thenReturn(mockedConfigurationLoader);
+        when(mockedConfigurationLoader.loadConfiguration()).thenReturn(mockedConfiguration);
+        when(mockedConfiguration.getReaderType()).thenReturn(readerType);
+        when(NewsReaderFactory.getReader(readerType)).thenReturn(mockedNewsReader);
+        when(mockedNewsReader.read()).thenReturn(mockedIncomingNews);
+        when(PublishableNews.create()).thenReturn(mockedPublishableNews);
+        when(mockedIncomingNews.elems()).thenReturn(incomingInfos);
+        when(mockedIncomingInfo.requiresSubsciption()).thenReturn(Boolean.FALSE);
+        when(mockedIncomingInfo.getContent()).thenReturn(content);
+        when(mockedIncomingInfo.getSubscriptionType()).thenReturn(SubsciptionType.C);
+
+        newsLoader.loadNews();
+
+        Mockito.verify(mockedPublishableNews, Mockito.times(expectedCallsCount))
+                .addForSubscription(Matchers.any(String.class), Matchers.any(SubsciptionType.class));
+
+    }
+
+    @Test
+    public void publishableNewsAddSubscriptionCalledFiveTimes() {
+        int expectedCallsCount = 5;
+        String readerType = "Sport";
+        String content = "content";
+        incomingInfos.add(mockedIncomingInfo);
+        incomingInfos.add(mockedIncomingInfo);
+        incomingInfos.add(mockedIncomingInfo);
+        incomingInfos.add(mockedIncomingInfo);
+        incomingInfos.add(mockedIncomingInfo);
+
+        PowerMockito.mockStatic(PublishableNews.class);
+        PublishableNews mockedPublishableNews = mock(PublishableNews.class);
+
+        when(ConfigurationLoader.getInstance()).thenReturn(mockedConfigurationLoader);
+        when(mockedConfigurationLoader.loadConfiguration()).thenReturn(mockedConfiguration);
+        when(mockedConfiguration.getReaderType()).thenReturn(readerType);
+        when(NewsReaderFactory.getReader(readerType)).thenReturn(mockedNewsReader);
+        when(mockedNewsReader.read()).thenReturn(mockedIncomingNews);
+        when(PublishableNews.create()).thenReturn(mockedPublishableNews);
+        when(mockedIncomingNews.elems()).thenReturn(incomingInfos);
+        when(mockedIncomingInfo.requiresSubsciption()).thenReturn(Boolean.TRUE);
+        when(mockedIncomingInfo.getContent()).thenReturn(content);
+        when(mockedIncomingInfo.getSubscriptionType()).thenReturn(SubsciptionType.C);
+
+        newsLoader.loadNews();
+
+        Mockito.verify(mockedPublishableNews, Mockito.times(expectedCallsCount))
+                .addForSubscription(Matchers.any(String.class), Matchers.any(SubsciptionType.class));
+
+    }
 }
