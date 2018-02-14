@@ -25,7 +25,25 @@
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>1.9.13</version>
 		</dependency>
-		
+
+	  <!-- https://mvnrepository.com/artifact/org.powermock/powermock-module-junit4 -->
+	  <dependency>
+		  <groupId>org.powermock</groupId>
+		  <artifactId>powermock-module-junit4</artifactId>
+		  <version>1.7.3</version>
+		  <scope>test</scope>
+	  </dependency>
+
+	  <!-- https://mvnrepository.com/artifact/org.powermock/powermock-api-easymock -->
+	  <dependency>
+		  <groupId>org.powermock</groupId>
+		  <artifactId>powermock-api-mockito</artifactId>
+		  <version>1.7.3</version>
+		  <scope>test</scope>
+	  </dependency>
+
+
+
   </dependencies>
 	<build>
 		<plugins>
