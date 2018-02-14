@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
@@ -13,6 +14,7 @@ import org.powermock.reflect.Whitebox;
 import java.util.List;
 
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -30,21 +32,21 @@ public class NewsLoaderTest {
     private Configuration configuration = new Configuration();
     private IncomingNews incomingNews = new IncomingNews();
     private PublishableNews publishableNews = PublishableNews.create();
-    @Mock
     private NewsReader newsReaderMock;
-    @Mock
-    private ConfigurationLoader mockedConfigurationLoader;
+    private ConfigurationLoader configurationLoaderMock;
 
 
     @Before
     public void setUp() {
+        newsReaderMock = mock(NewsReader.class);
+        configurationLoaderMock = mock(ConfigurationLoader.class);
         mockStatic(ConfigurationLoader.class);
         mockStatic(NewsReaderFactory.class);
-        String readerTypeValue = "readerTypeValue";
-        Whitebox.setInternalState(configuration, "readerTypeValue", readerTypeValue);
-        when(ConfigurationLoader.getInstance()).thenReturn(mockedConfigurationLoader);
+        String readerType = "readerType";
+        Whitebox.setInternalState(configuration, "readerType", readerType);
+        when(ConfigurationLoader.getInstance()).thenReturn(configurationLoaderMock);
         when(ConfigurationLoader.getInstance().loadConfiguration()).thenReturn(configuration);
-        when(NewsReaderFactory.getReader(readerTypeValue)).thenReturn(newsReaderMock);
+        when(NewsReaderFactory.getReader(readerType)).thenReturn(newsReaderMock);
         when(newsReaderMock.read()).thenReturn(incomingNews);
     }
 
@@ -56,8 +58,8 @@ public class NewsLoaderTest {
 
     @Test
     public void properlyAddSubscription() {
-        publishableNews.addForSubscription("", SubsciptionType.A);
-        List<String> news = Whitebox.getInternalState(publishableNews, "");
+        publishableNews.addForSubscription("content", SubsciptionType.A);
+        List<String> news = Whitebox.getInternalState(publishableNews, "subscribentContent");
         assertThat(news.size(), Matchers.is(1));
     }
 
