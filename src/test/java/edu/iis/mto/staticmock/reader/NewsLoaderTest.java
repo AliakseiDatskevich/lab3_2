@@ -4,6 +4,8 @@ import edu.iis.mto.staticmock.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -17,7 +19,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-@RunWith(PowerMockRunner.class) @PrepareForTest({NewsReaderFactory.class, ConfigurationLoader.class})
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({NewsReaderFactory.class, ConfigurationLoader.class, PublishableNews.class})
 public class NewsLoaderTest {
 
     private NewsLoader newsLoader = new NewsLoader();
@@ -83,6 +86,33 @@ public class NewsLoaderTest {
         List<String> publicContent = (List<String>) Whitebox.getInternalState(publishableNews, "publicContent");
 
         assertThat(publicContent.size(), is(expectedElementsCount));
+
+    }
+
+    @Test
+    public void publishableNewsAddSubscriptionCalledOnce() {
+        int expectedCallsCount = 1;
+        String readerType = "Sport";
+        String content = "content";
+        incomingInfos.add(mockedIncomingInfo);
+        PowerMockito.mockStatic(PublishableNews.class);
+        PublishableNews mockedPublishableNews = mock(PublishableNews.class);
+
+        when(ConfigurationLoader.getInstance()).thenReturn(mockedConfigurationLoader);
+        when(mockedConfigurationLoader.loadConfiguration()).thenReturn(mockedConfiguration);
+        when(mockedConfiguration.getReaderType()).thenReturn(readerType);
+        when(NewsReaderFactory.getReader(readerType)).thenReturn(mockedNewsReader);
+        when(mockedNewsReader.read()).thenReturn(mockedIncomingNews);
+        when(PublishableNews.create()).thenReturn(mockedPublishableNews);
+        when(mockedIncomingNews.elems()).thenReturn(incomingInfos);
+        when(mockedIncomingInfo.requiresSubsciption()).thenReturn(Boolean.TRUE);
+        when(mockedIncomingInfo.getContent()).thenReturn(content);
+        when(mockedIncomingInfo.getSubscriptionType()).thenReturn(SubsciptionType.C);
+
+        newsLoader.loadNews();
+
+        Mockito.verify(mockedPublishableNews, Mockito.times(expectedCallsCount))
+                .addForSubscription(Matchers.any(String.class), Matchers.any(SubsciptionType.class));
 
     }
 }
