@@ -63,4 +63,26 @@ public class NewsLoaderTest {
         assertThat(publicContent.size(), is(expectedElementsCount));
 
     }
+
+    @Test
+    public void loadNewsReturnOnePublishableNewsWithTwoPublicElements() {
+        int expectedElementsCount = 2;
+        String readerType = "Sport";
+        incomingInfos.add(mockedIncomingInfo);
+        incomingInfos.add(mockedIncomingInfo);
+
+        when(ConfigurationLoader.getInstance()).thenReturn(mockedConfigurationLoader);
+        when(mockedConfigurationLoader.loadConfiguration()).thenReturn(mockedConfiguration);
+        when(mockedConfiguration.getReaderType()).thenReturn(readerType);
+        when(NewsReaderFactory.getReader(readerType)).thenReturn(mockedNewsReader);
+        when(mockedNewsReader.read()).thenReturn(mockedIncomingNews);
+        when(mockedIncomingNews.elems()).thenReturn(incomingInfos);
+        when(mockedIncomingInfo.requiresSubsciption()).thenReturn(Boolean.FALSE);
+
+        PublishableNews publishableNews = newsLoader.loadNews();
+        List<String> publicContent = (List<String>) Whitebox.getInternalState(publishableNews, "publicContent");
+
+        assertThat(publicContent.size(), is(expectedElementsCount));
+
+    }
 }
