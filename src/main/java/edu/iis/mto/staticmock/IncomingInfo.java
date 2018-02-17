@@ -1,7 +1,7 @@
 package edu.iis.mto.staticmock;
 
 public class IncomingInfo {
-	
+
 	private final String content;
 	private final SubsciptionType subscriptionType;
 
@@ -9,6 +9,7 @@ public class IncomingInfo {
 		this.content = content;
 		this.subscriptionType = subscriptionType;
 	}
+
 	public boolean requiresSubsciption() {
 		return subscriptionType != SubsciptionType.NONE;
 	}
@@ -17,7 +18,7 @@ public class IncomingInfo {
 		return content;
 	}
 
-	public SubsciptionType getSubscriptionType() {		
+	public SubsciptionType getSubscriptionType() {
 		return subscriptionType;
 	}
 
