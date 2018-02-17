@@ -67,6 +67,26 @@ public class NewsLoaderTest {
             assertEquals(publicContent.get(1), "content1");
         }
 
+
+        @Test
+        public void hasPublicAndSubscribentContent() {
+            when(newsReader.read()).thenReturn(prepareIncomingNews2());
+
+            NewsLoader newsLoader = new NewsLoader();
+
+            PublishableNews publishableNews = newsLoader.loadNews();
+
+            List<String> publicContent = (List<String>) Whitebox.getInternalState(publishableNews, "publicContent");
+            List<String> subscribentContent = (List<String>) Whitebox.getInternalState(publishableNews, "subscribentContent");
+
+            assertEquals(publicContent.size(), 1);
+            assertEquals(subscribentContent.size(), 2);
+
+            assertEquals(publicContent.get(0), "publicContent");
+            assertEquals(subscribentContent.get(0), "content");
+            assertEquals(subscribentContent.get(1), "content1");
+        }
+
     private IncomingNews prepareIncomingNews() {
         IncomingNews news = new IncomingNews();
         return news;
@@ -76,6 +96,14 @@ public class NewsLoaderTest {
         IncomingNews news = new IncomingNews();
         news.add(new IncomingInfo("content", SubsciptionType.NONE));
         news.add(new IncomingInfo("content1", SubsciptionType.NONE));
+        return news;
+    }
+
+    private IncomingNews prepareIncomingNews2() {
+        IncomingNews news = new IncomingNews();
+        news.add(new IncomingInfo("content", SubsciptionType.A));
+        news.add(new IncomingInfo("publicContent", SubsciptionType.NONE));
+        news.add(new IncomingInfo("content1", SubsciptionType.C));
         return news;
     }
 } 
