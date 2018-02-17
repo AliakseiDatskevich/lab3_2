@@ -79,4 +79,22 @@ public class NewsReaderTests {
 		Mockito.verify(publishableNews, Mockito.times(0)).addForSubscription(anyString(), any(SubsciptionType.class));
 		Mockito.verify(publishableNews, Mockito.times(1)).addPublicInfo(eq("pub"));
 	}
+
+	@Test
+	public void testPublicAndSubscriptionContent() {
+		IncomingNews news = new IncomingNews();
+		news.add(new IncomingInfo("pub", SubsciptionType.NONE));
+		news.add(new IncomingInfo("sub1", SubsciptionType.A));
+		news.add(new IncomingInfo("sub2", SubsciptionType.B));
+		news.add(new IncomingInfo("sub3", SubsciptionType.C));
+		doReturn(news).when(newsReader).read();
+		when(PublishableNews.create()).thenReturn(mock(PublishableNews.class));
+
+		PublishableNews publishableNews = new NewsLoader().loadNews();
+
+		Mockito.verify(publishableNews, Mockito.times(1)).addPublicInfo(eq("pub"));
+		Mockito.verify(publishableNews, Mockito.times(1)).addForSubscription(eq("sub1"), eq(SubsciptionType.A));
+		Mockito.verify(publishableNews, Mockito.times(1)).addForSubscription(eq("sub2"), eq(SubsciptionType.B));
+		Mockito.verify(publishableNews, Mockito.times(1)).addForSubscription(eq("sub3"), eq(SubsciptionType.C));
+	}
 }
