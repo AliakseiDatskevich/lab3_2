@@ -11,6 +11,7 @@ import static org.mockito.Matchers.*;
 
 import edu.iis.mto.staticmock.Configuration;
 import edu.iis.mto.staticmock.ConfigurationLoader;
+import edu.iis.mto.staticmock.IncomingInfo;
 import edu.iis.mto.staticmock.IncomingNews;
 import edu.iis.mto.staticmock.NewsLoader;
 import edu.iis.mto.staticmock.NewsReaderFactory;
@@ -45,12 +46,24 @@ public class NewsReaderTests {
 	public void testEmptyListOfNews() {
 		IncomingNews news = new IncomingNews();
 		doReturn(news).when(newsReader).read();
-		NewsLoader newsLoader = new NewsLoader();
 		when(PublishableNews.create()).thenReturn(mock(PublishableNews.class));
 
-		PublishableNews publishableNews = newsLoader.loadNews();
+		PublishableNews publishableNews = new NewsLoader().loadNews();
 
 		Mockito.verify(publishableNews, Mockito.times(0)).addForSubscription(anyString(), any(SubsciptionType.class));
+		Mockito.verify(publishableNews, Mockito.times(0)).addPublicInfo(anyString());
+	}
+
+	@Test
+	public void testSubscriptionContent() {
+		IncomingNews news = new IncomingNews();
+		news.add(new IncomingInfo("sub", SubsciptionType.C));
+		doReturn(news).when(newsReader).read();
+		when(PublishableNews.create()).thenReturn(mock(PublishableNews.class));
+
+		PublishableNews publishableNews = new NewsLoader().loadNews();
+
+		Mockito.verify(publishableNews, Mockito.times(1)).addForSubscription(eq("sub"), eq(SubsciptionType.C));
 		Mockito.verify(publishableNews, Mockito.times(0)).addPublicInfo(anyString());
 	}
 }
