@@ -1,14 +1,15 @@
 package edu.iis.mto.staticmock;
 
-import edu.iis.mto.staticmock.*;
 import edu.iis.mto.staticmock.reader.NewsReader;
-import org.junit.Test;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
 import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
@@ -17,6 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.*;
 import static org.powermock.api.mockito.PowerMockito.verifyStatic;
+
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(value = { ConfigurationLoader.class, NewsReaderFactory.class})
@@ -30,6 +32,7 @@ public class NewsLoaderTest {
     public void setUp() {
         mockStatic(ConfigurationLoader.class);
         mockStatic(NewsReaderFactory.class);
+
         configurationLoader = mock(ConfigurationLoader.class);
         when(ConfigurationLoader.getInstance()).thenReturn(configurationLoader);
 
@@ -39,9 +42,10 @@ public class NewsLoaderTest {
 
         newsReader = mock(NewsReader.class);
         when(NewsReaderFactory.getReader(anyString())).thenReturn(newsReader);
+    }
 
-     @Test
-        public void hasEmptyListForNoNews() {
+    @Test
+    public void hasEmptyListForNoNews() {
         when(newsReader.read()).thenReturn(prepareIncomingNews());
 
         NewsLoader newsLoader = new NewsLoader();
@@ -55,56 +59,55 @@ public class NewsLoaderTest {
         assertTrue(subscribentContent.isEmpty());
     }
 
-        @Test
-        public void hasPublicContent() {
-            when(newsReader.read()).thenReturn(prepareIncomingNews1());
+    @Test
+    public void hasPublicContent() {
+        when(newsReader.read()).thenReturn(prepareIncomingNews1());
 
-            NewsLoader newsLoader = new NewsLoader();
+        NewsLoader newsLoader = new NewsLoader();
 
-            PublishableNews publishableNews = newsLoader.loadNews();
+        PublishableNews publishableNews = newsLoader.loadNews();
 
-            List<String> publicContent = (List<String>) Whitebox.getInternalState(publishableNews, "publicContent");
-            List<String> subscribentContent = (List<String>) Whitebox.getInternalState(publishableNews, "subscribentContent");
+        List<String> publicContent = (List<String>) Whitebox.getInternalState(publishableNews, "publicContent");
+        List<String> subscribentContent = (List<String>) Whitebox.getInternalState(publishableNews, "subscribentContent");
 
-            assertEquals(publicContent.size(), 2);
-            assertTrue(subscribentContent.isEmpty());
+        assertEquals(publicContent.size(), 2);
+        assertTrue(subscribentContent.isEmpty());
 
-            assertEquals(publicContent.get(0), "content");
-            assertEquals(publicContent.get(1), "content1");
-        }
+        assertEquals(publicContent.get(0), "content");
+        assertEquals(publicContent.get(1), "content1");
+    }
 
+    @Test
+    public void hasPublicAndSubscribentContent() {
+        when(newsReader.read()).thenReturn(prepareIncomingNews2());
 
-        @Test
-        public void hasPublicAndSubscribentContent() {
-            when(newsReader.read()).thenReturn(prepareIncomingNews2());
+        NewsLoader newsLoader = new NewsLoader();
 
-            NewsLoader newsLoader = new NewsLoader();
+        PublishableNews publishableNews = newsLoader.loadNews();
 
-            PublishableNews publishableNews = newsLoader.loadNews();
+        List<String> publicContent = (List<String>) Whitebox.getInternalState(publishableNews, "publicContent");
+        List<String> subscribentContent = (List<String>) Whitebox.getInternalState(publishableNews, "subscribentContent");
 
-            List<String> publicContent = (List<String>) Whitebox.getInternalState(publishableNews, "publicContent");
-            List<String> subscribentContent = (List<String>) Whitebox.getInternalState(publishableNews, "subscribentContent");
+        assertEquals(publicContent.size(), 1);
+        assertEquals(subscribentContent.size(), 2);
 
-            assertEquals(publicContent.size(), 1);
-            assertEquals(subscribentContent.size(), 2);
+        assertEquals(publicContent.get(0), "publicContent");
+        assertEquals(subscribentContent.get(0), "content");
+        assertEquals(subscribentContent.get(1), "content1");
+    }
 
-            assertEquals(publicContent.get(0), "publicContent");
-            assertEquals(subscribentContent.get(0), "content");
-            assertEquals(subscribentContent.get(1), "content1");
-        }
+    @Test
+    public void areMethodsCalledProperly() {
 
-        @Test
-        public void areMethodsCalledProperly() {
+        when(newsReader.read()).thenReturn(prepareIncomingNews2());
+        NewsLoader newsLoader = new NewsLoader();
+        newsLoader.loadNews();
 
-            when(newsReader.read()).thenReturn(prepareIncomingNews2());
-            NewsLoader newsLoader = new NewsLoader();
-            newsLoader.loadNews();
+        verify(configurationLoader, times(1)).loadConfiguration();
 
-            verify(configurationLoader, times(1)).loadConfiguration();
-
-            verifyStatic(NewsReaderFactory.class);
-            NewsReaderFactory.getReader("WS");
-        }
+        verifyStatic(NewsReaderFactory.class);
+        NewsReaderFactory.getReader("WS");
+    }
 
     private IncomingNews prepareIncomingNews() {
         IncomingNews news = new IncomingNews();
@@ -125,4 +128,4 @@ public class NewsLoaderTest {
         news.add(new IncomingInfo("content1", SubsciptionType.C));
         return news;
     }
-} 
+}
