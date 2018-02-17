@@ -17,8 +17,7 @@ public class NewsReaderFactory {
 			break;
 
 		default:
-			throw new IllegalArgumentException("unknown reater type: "
-					+ readerType);
+			throw new IllegalArgumentException("unknown reater type: " + readerType);
 		}
 		return reader;
 	}
